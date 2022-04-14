@@ -53,6 +53,7 @@ const _multiline_delimiters = {
  */
 file_sel.addEventListener('change', async (event) => {
     files = event.target.files;
+    document.getElementById("loading").style.display = "block";
     await read_files(files);
 });
 
@@ -228,14 +229,15 @@ function to_md(comments, file_name) {
  * @returns None
  */
 function download(text) {
-    var element = document.createElement('a');
+    document.getElementById("loading").style.display = "none";
+    var element = document.getElementById('download-btn');//document.createElement('a');
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent('<style>*{font-family:\'Consolas ligaturized v2\';}</style>\n' + text));
     element.setAttribute('download', 'documentation.md');
 
-    element.style.display = 'none';
+    /*element.style.display = 'none';
     document.body.appendChild(element);
 
     element.click();
 
-    document.body.removeChild(element);
+    document.body.removeChild(element);*/
 }
