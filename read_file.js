@@ -12,6 +12,7 @@
  * |attribute name|attribute description|
  * ...
  * |attribute name|attribute description|
+ * 
  *  \-\-\- <- line
  * 
  * If more than one file is provided, each file will be parsed and concatenated to the previous one, but each file "section" will start with its name.
