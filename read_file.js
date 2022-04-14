@@ -27,9 +27,24 @@
  * @variables
  *      - List files: list of files used to create the documentation
  *      - HTMLElement file_sel: file selector HTML element used to select the files
+ *      - JSONObject _delimiters: contains the delimiters of the comments for each language;
+ *                                  Put first the delimiters that use more characters (order is important)
+ *      - JSONObject _multiline_delimiters: contains the starting and ending delimiters of the multiline comments
  */
 var files = [];
 const file_sel = document.getElementById('file-selector');
+const _delimiters = {
+    'c': ['/*', '*/', '/', '*'],
+    'cpp': ['/*', '*/', '/', '*'],
+    'js': ['/*', '*/', '/', '*'],
+    'py': ["'''", "#"]
+};
+const _multiline_delimiters = {
+    'c': ['/*', '*/'],
+    'cpp': ['/*', '*/'],
+    'js': ['/*', '*/'],
+    'py': ["'''", "'''"]
+};
 
 /**
  * @name ChangeEventListener
@@ -57,7 +72,7 @@ function get_only_comment_blocks(text, start_del, end_del) {
     var to_check = text.substring(0);
     while (to_check.length > 0 && (to_check.indexOf(start_del) > -1 && to_check.indexOf(end_del) > -1)) {
         var start_index = to_check.indexOf(start_del);
-        var end_index = to_check.indexOf(end_del);
+        var end_index = start_index + start_del.length + to_check.substring(start_index + start_del.length).indexOf(end_del);
         var comment_block = to_check.substring(start_index, end_index + end_del.length);
         var no_space = comment_block.replaceAll(" ", "");
         if (no_space.includes("@") && no_space.includes("@brief") && no_space.includes("@name")) {
@@ -112,7 +127,7 @@ async function read_files(files) {
     for (var f of Object.values(files)) {
         text += await read_fileblock(f);
     }
-    download(text);
+    download(text); //!! THIS IS IMPORTANT, REMEMBER TO DECOMMENT
 }
 
 /**
@@ -125,14 +140,14 @@ async function read_files(files) {
 async function read_fileblock(file) {
     var text = await file.text();
     var file_blocks_list = {};
-    var blocks_in_file = get_only_comment_blocks(text, "/*", "*/");
+    var file_extension = file.name.split('.').pop();
+    var blocks_in_file = get_only_comment_blocks(text, _multiline_delimiters[file_extension][0], _multiline_delimiters[file_extension][1]);
     blocks_in_file.forEach(block_text => {
         var block = {}; /*contains all the attributes in a block*/
         var trimmed_text = block_text.trim();
-        trimmed_text = remove_comment_symbols(trimmed_text, ["/*", "*/", "//", "*", "/"]);
+        trimmed_text = remove_comment_symbols(trimmed_text, _delimiters[file_extension]);
         var cases_list = split_by_delimiter(trimmed_text, "@");
         cases_list.splice(0, 1);
-        //console.log(cases_list);
         cases_list.forEach(c => {
             var str = c.trim();
             var split_index = str.indexOf(" ");
