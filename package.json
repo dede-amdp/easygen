@@ -1,0 +1,30 @@
+{
+  "name": "docgen",
+  "version": "1.0.0",
+  "description": "generate documentation from code comments automatically",
+  "main": "main.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dede-amdp/docgen.git"
+  },
+  "keywords": [
+    "documentation",
+    "generation"
+  ],
+  "author": "dede.adbeat",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/dede-amdp/docgen/issues"
+  },
+  "homepage": "https://github.com/dede-amdp/docgen#readme",
+  "devDependencies": {
+    "electron": "^18.0.4"
+  }
+}
