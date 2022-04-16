@@ -38,9 +38,9 @@ const file_sel = document.getElementById('file-selector');
 const files_done = document.getElementById('files-done-par');
 //const hub = document.getElementById('hub');
 const _delimiters = {
-    'c': ['/*', '*/', '/', '*'],
-    'cpp': ['/*', '*/', '/', '*'],
-    'js': ['/*', '*/', '/', '*'],
+    'c': ['/*', '*/', '//', '*'],
+    'cpp': ['/*', '*/', '//', '*'],
+    'js': ['/*', '*/', '//', '*'],
     'py': ["'''", "#"],
     'm': ["%{", "}%", "%"]
 };
@@ -66,6 +66,35 @@ file_sel.addEventListener('change', async (event) => {
 });
 
 
+function indexOfAll(str, pattern) {
+    var indexes = [];
+    var to_check = str;
+    var i, n;
+    while (to_check.length > 0) {
+        n = indexes.length;
+        i = to_check.indexOf(pattern);
+        if (i < 0) break;
+        if (n > 0)
+            indexes.push(indexes[n + 1] + i);
+        else
+            indexes.push(i);
+        to_check = to_check.substring(i + 1);
+    }
+    return indexes;
+}
+
+
+function escape_string(string, file_extension) {
+    var new_string = '';
+    for (var i = string.length - 1; i > 0; i--) {
+        new_string = string[i] + new_string;
+        if (_delimiters[file_extension].includes(string[i])) {
+            new_string = '\\' + new_string;
+        }
+    }
+    return new_string;
+}
+
 /**
  * @name get_only_comment_blocks
  * @brief extracts only the block comments from the file
@@ -75,16 +104,36 @@ file_sel.addEventListener('change', async (event) => {
  *      - String end_del: delimiter used to find the end of the comment block
  * @returns String List containing only the comment blocks
  */
-function get_only_comment_blocks(text, start_del, end_del) {
+function get_only_comment_blocks(text, start_del, end_del, file_extension) {
     var to_return = [];
     var to_check = text.substring(0);
     while (to_check.length > 0 && (to_check.indexOf(start_del) > -1 && to_check.indexOf(end_del) > -1)) {
         var start_index = to_check.indexOf(start_del);
         var end_index = start_index + start_del.length + to_check.substring(start_index + start_del.length).indexOf(end_del);
         var comment_block = to_check.substring(start_index, end_index + end_del.length);
+        if (comment_block.includes("@codeend")) {
+            to_check = to_check.substring(end_index + 1);
+            continue;
+        }
+        if (comment_block.includes("@codestart")) {
+            // there is a code snippet to be considered
+            var real_end_index = start_index + start_del.length + to_check.substring(start_index + start_del.length).indexOf('@codeend');
+            comment_block = to_check.substring(start_index, real_end_index);
+            comment_block = comment_block.substring(0, comment_block.lastIndexOf(start_del));
+            comment_block = comment_block.substring(0, comment_block.indexOf(end_del)) +
+                escape_string(comment_block.substring(
+                    comment_block.indexOf(end_del)
+                    + 1 + end_del.length),
+                    file_extension) + end_del;
+        }
         var no_space = comment_block.replaceAll(" ", "");
         if (no_space.includes("@") && (no_space.includes("@brief") || no_space.includes("@name"))) {
             to_return.push(comment_block);
+        } else if (no_space.includes("@codestart")) {
+            var old_block = to_return.pop();
+            old_block = old_block.substring(0, old_block.lastIndexOf(end_del));
+            var new_block = comment_block.substring(comment_block.indexOf(start_del) + start_del.length);
+            to_return.push(old_block + new_block); //add the code snippet to the fields of the comment block
         }
         to_check = to_check.substring(end_index + 1);
     }
@@ -156,7 +205,7 @@ async function read_fileblock(file) {
     var text = await file.text();
     var file_blocks_list = {};
     var file_extension = file.name.split('.').pop();
-    var blocks_in_file = get_only_comment_blocks(text, _multiline_delimiters[file_extension][0], _multiline_delimiters[file_extension][1]);
+    var blocks_in_file = get_only_comment_blocks(text, _multiline_delimiters[file_extension][0], _multiline_delimiters[file_extension][1], file_extension);
     if (blocks_in_file.length == 0) return "";
     blocks_in_file.forEach(block_text => {
         var block = {}; /*contains all the attributes in a block*/
@@ -189,7 +238,9 @@ function remove_comment_symbols(text, comment_symbols) {
     var new_text = '';
     split_text.forEach(line => {
         var str_line = line;
-        comment_symbols.forEach(s => str_line = str_line.replace(s, ''));
+        comment_symbols.forEach(s => {
+            var indexes = indexOfAll(str_line, s);
+        });//str_line = str_line.replace(s, ''));
         new_text += str_line + "\n";
     });
     return new_text;
@@ -207,26 +258,37 @@ function remove_comment_symbols(text, comment_symbols) {
  * @returns String containing the documentation for the file
  */
 function to_md(comments, file_name) {
-    md_text = "";
+    var file_extension = file_name.split('.').pop();
+    var md_text = "";
     md_text += `# **${file_name} Description**\n`;
     Object.values(comments).forEach(comment_block => {
         md_text += `## **${comment_block['name']}**\n`;
         md_text += `> ${comment_block['brief']}\n\n`;
         var keys = Object.keys(comment_block);
+        var codesnippets = [];
         if (comment_block['note'])
             md_text += `${comment_block['note']}\n`;
         for (var i = keys.length - 1; i >= 0; i--) {
             if (keys[i] == "name" || keys[i] == "brief" || keys[i] == "note")
                 keys.splice(i, 1);
+            else if (keys[i].includes("codestart"))
+                codesnippets.push(keys.splice(i, 1)[0]);
         }
         if (keys.length > 0) {
             md_text += `|Attribute|Description|\n|:---:|:---|\n`;
             for (var k of keys) {
                 attribute = comment_block[k];
                 if (k != "brief" && k != "name" && k != "note") {
-                    md_text += `|**${k.replaceAll("\r\n", "<br>")}**|${attribute.replaceAll("\r\n", "<br>")}|\n`;
+                    md_text += `|**${k.replaceAll("\r\n", "<br>")}**|${attribute.replaceAll("\r\n", "\n")}|\n`;
                 }
             }
+        }
+        for (var k of codesnippets) {
+            attribute = comment_block[k];
+            md_text += `### ${k.substring(k.indexOf('(') + 1, k.indexOf(')'))}\n`;
+            md_text += "```";
+            md_text += `${file_extension}\n${attribute.replaceAll("\r\n", "\n")}\n`;
+            md_text += "```\n";
         }
     });
     md_text += '---\n';
@@ -247,16 +309,4 @@ function download(text) {
     //element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent('<style>*{font-family:\'Consolas ligaturized v2\';}</style>\n' + text));
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text + '\ngenerated with [EasyGen](https://github.com/dede-amdp/easygen).'));
     element.setAttribute('download', 'documentation.md');
-
-    /*element.style.display = 'none';
-    document.body.appendChild(element);
-
-    element.click();
-
-    document.body.removeChild(element);*/
 }
-
-/*
-    !!TODO:
-        * Add a way to show code snippets, maybe @codestart @codeend with a name field to understand to which function it refers?
-*/
