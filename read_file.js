@@ -128,12 +128,11 @@ function get_only_comment_blocks(text, start_del, end_del, file_extension) {
         }
         var no_space = comment_block.replaceAll(" ", "");
         if (no_space.includes("@") && (no_space.includes("@brief") || no_space.includes("@name"))) {
-            to_return.push(comment_block);
+            to_return.push([comment_block]);
         } else if (no_space.includes("@codestart")) {
             var old_block = to_return.pop();
-            old_block = old_block.substring(0, old_block.lastIndexOf(end_del));
-            var new_block = comment_block.substring(comment_block.indexOf(start_del) + start_del.length);
-            to_return.push(old_block + new_block); //add the code snippet to the fields of the comment block
+            old_block.push(comment_block)
+            to_return.push(old_block);
         }
         to_check = to_check.substring(end_index + 1);
     }
@@ -209,17 +208,25 @@ async function read_fileblock(file) {
     if (blocks_in_file.length == 0) return "";
     blocks_in_file.forEach(block_text => {
         var block = {}; /*contains all the attributes in a block*/
-        var trimmed_text = block_text.trim();
-        trimmed_text = remove_comment_symbols(trimmed_text, _delimiters[file_extension]);
-        var cases_list = split_by_delimiter(trimmed_text, "@");
-        cases_list.splice(0, 1);
-        cases_list.forEach(c => {
-            var str = c.trim();
-            var split_index = str.indexOf(" ");
-            var case_name = str.substring(0, split_index).replace("\n", '').trim();
-            var case_body = str.substring(split_index + 1).trim();
-            block[case_name] = case_body;
-        });
+        for (var i = 0; i < block_text.length; i++) {
+            var trimmed_text = block_text[i].trim();
+            trimmed_text = remove_comment_symbols(trimmed_text, _delimiters[file_extension]);
+            var cases_list = split_by_delimiter(trimmed_text, "@");
+            cases_list.splice(0, 1);
+            cases_list.forEach(c => {
+                var str = c.trim();
+                var split_index = str.indexOf(" ");
+                var case_name = str.substring(0, split_index).replace("\n", '').trim();
+                var case_body = str.substring(split_index + 1).trim();
+                if (i == 0)
+                    block[case_name] = case_body;
+                else {
+                    if (!('codesnippets' in block))
+                        block['codesnippets'] = [];
+                    block['codesnippets'].push([case_name, case_body]);
+                }
+            });
+        }
         file_blocks_list[block['name']] = block;
     });
     return to_md(file_blocks_list, file.name);
@@ -265,14 +272,11 @@ function to_md(comments, file_name) {
         md_text += `## **${comment_block['name']}**\n`;
         md_text += `> ${comment_block['brief']}\n\n`;
         var keys = Object.keys(comment_block);
-        var codesnippets = [];
         if (comment_block['note'])
             md_text += `${comment_block['note']}\n`;
         for (var i = keys.length - 1; i >= 0; i--) {
-            if (keys[i] == "name" || keys[i] == "brief" || keys[i] == "note")
+            if (keys[i] == "name" || keys[i] == "brief" || keys[i] == "note" || keys[i] == "codesnippets")
                 keys.splice(i, 1);
-            else if (keys[i].includes("codestart"))
-                codesnippets.push(keys.splice(i, 1)[0]);
         }
         if (keys.length > 0) {
             md_text += `|Attribute|Description|\n|:---:|:---|\n`;
@@ -283,8 +287,9 @@ function to_md(comments, file_name) {
                 }
             }
         }
-        for (var k of codesnippets) {
-            attribute = comment_block[k];
+        for (var code of comment_block['codesnippets']) {
+            var attribute = code[1];
+            var k = code[0];
             md_text += `### ${k.substring(k.indexOf('(') + 1, k.indexOf(')'))}\n`;
             md_text += "```";
             md_text += `${file_extension}\n${attribute.replaceAll("\r\n", "\n")}\n`;
