@@ -2,6 +2,8 @@
 <html>
 
 <head>
+    <meta charset="UTF-8">
+    <title>EasyGen</title>
     <link href="./index.css" rel="stylesheet" />
 </head>
 
@@ -12,7 +14,7 @@
             <div id="input-div" class="center">
                 <label class="custom-file-upload"><input type="file" id="file-selector" multiple> <img
                         src="./icons/upload_icon.svg"></img></label><br>
-                Select File<br>
+                Select Files<br>
                 <div class="loader center" id="loading"></div><br>
             </div>
             <div id="files-done" class="center">
@@ -40,16 +42,16 @@
             <li><b>Fields</b>: fields are needed to recognize different parts of the information.</li>
         </ul>
         All the fields start with a `@` symbol and then are followed by the information you want to write, for
-        example<br>
-        @name method_name
-        @brief this is an example of what you can do
-        @note this is just an example and it is possible to add any other user defined fields
-        @variables
-        - a: something
-        - b: something else
+        example<br><br>
+        <code>@name method_name<br>
+        @brief this is an example of what you can do<br>
+        @note this is just an example and it is possible to add any other user defined fields<br>
+        @variables<br>
+        - a: something<br>
+        - b: something else</code><br><br>
         the only required fields are `@name` which contains the name of the
         method that you are describing (or of whatever part of the code is going to be described) and `@brief` which
-        just contains a summary of the method that will is currently being described.<br>
+        just contains a summary of the method that is currently being described.<br>
         Another special field is `@note` which can be used freely to add any information is needed.<br>
         Lastly, all the other fields (that you can define freely) will be inserted inside a table.<br>
         <h1>✨ What about the final result?</h1>

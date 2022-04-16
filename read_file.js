@@ -41,13 +41,15 @@ const _delimiters = {
     'c': ['/*', '*/', '/', '*'],
     'cpp': ['/*', '*/', '/', '*'],
     'js': ['/*', '*/', '/', '*'],
-    'py': ["'''", "#"]
+    'py': ["'''", "#"],
+    'm': ["%{", "}%", "%"]
 };
 const _multiline_delimiters = {
     'c': ['/*', '*/'],
     'cpp': ['/*', '*/'],
     'js': ['/*', '*/'],
-    'py': ["'''", "'''"]
+    'py': ["'''", "'''"],
+    'm': ["%{", "}%"]
 };
 
 document.getElementById('supported').innerHTML = Object.keys(_delimiters).map((str) => ` \`${str}\``);
@@ -62,15 +64,6 @@ file_sel.addEventListener('change', async (event) => {
     document.getElementById("loading").style.display = "block";
     await read_files(files);
 });
-/*hub.ondragover = dropContainer.ondragenter = function (evt) {
-    evt.preventDefault();
-};*/
-/*hub.addEventListener('drop', async (event) => {
-    event.preventDefault();
-    console.log(event);
-    file_sel.files = event.dataTransfer.files;
-});*/
-
 
 
 /**
@@ -90,7 +83,7 @@ function get_only_comment_blocks(text, start_del, end_del) {
         var end_index = start_index + start_del.length + to_check.substring(start_index + start_del.length).indexOf(end_del);
         var comment_block = to_check.substring(start_index, end_index + end_del.length);
         var no_space = comment_block.replaceAll(" ", "");
-        if (no_space.includes("@") && no_space.includes("@brief") && no_space.includes("@name")) {
+        if (no_space.includes("@") && (no_space.includes("@brief") || no_space.includes("@name"))) {
             to_return.push(comment_block);
         }
         to_check = to_check.substring(end_index + 1);
@@ -194,7 +187,6 @@ async function read_fileblock(file) {
 function remove_comment_symbols(text, comment_symbols) {
     var split_text = text.split("\n");
     var new_text = '';
-    /*console.log(split_text);*/
     split_text.forEach(line => {
         var str_line = line;
         comment_symbols.forEach(s => str_line = str_line.replace(s, ''));
@@ -215,7 +207,6 @@ function remove_comment_symbols(text, comment_symbols) {
  * @returns String containing the documentation for the file
  */
 function to_md(comments, file_name) {
-    //console.log(comments)
     md_text = "";
     md_text += `# **${file_name} Description**\n`;
     Object.values(comments).forEach(comment_block => {
@@ -245,7 +236,7 @@ function to_md(comments, file_name) {
 /**
  * @name download
  * @brief this method download the documentation built with this tool
- * @note this method simply creates an `a` HTMLElement to download the text that then gets destroyed (leaving the dom untouched)
+ * @note this method simply assign to an `a` HTMLElement the data to be downloaded
  * @variables
  *      - String text: the documentation to be downloaded
  * @returns None
@@ -264,3 +255,8 @@ function download(text) {
 
     document.body.removeChild(element);*/
 }
+
+/*
+    !!TODO:
+        * Add a way to show code snippets, maybe @codestart @codeend with a name field to understand to which function it refers?
+*/
