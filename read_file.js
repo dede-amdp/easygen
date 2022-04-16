@@ -41,7 +41,7 @@ const _delimiters = {
     'c': ['/*', '*/', '//', '/', '*'],
     'cpp': ['/*', '*/', '//', '/', '*'],
     'js': ['/*', '*/', '//', '/', '*'],
-    'py': ["'''", "#"],
+    'py': ["'''", "'", "#"],
     'm': ["%{", "}%", "%"]
 };
 const _multiline_delimiters = {
@@ -120,14 +120,11 @@ function get_only_comment_blocks(text, start_del, end_del, file_extension) {
             // there is a code snippet to be considered
             var real_end_index = start_index + start_del.length + to_check.substring(start_index + start_del.length).indexOf('@codeend');
             comment_block = to_check.substring(start_index, real_end_index);
-            comment_block = comment_block.substring(0, comment_block.lastIndexOf(start_del));
-            comment_block = comment_block.substring(0, comment_block.indexOf(end_del)) +
-                escape_string(comment_block.substring(
-                    comment_block.indexOf(end_del)
-                    + 1 + end_del.length),
-                    file_extension) + end_del;
+            comment_block = comment_block.substring(0, comment_block.lastIndexOf(start_del) + start_del.length).trim();
+            var end_name = start_del.length + comment_block.substring(start_del.length).indexOf(end_del); // check if start_del.length+1 is needed
+            var end_all = end_name + end_del.length + comment_block.substring(end_name + end_del.length).lastIndexOf(start_del);
+            comment_block = comment_block.substring(0, end_name) + "\n" + escape_string(comment_block.substring(end_name + end_del.length, end_all), file_extension) + end_del;
         }
-        //console.log(comment_block)
         var no_space = comment_block.replaceAll(" ", "");
         if (no_space.includes("@") && (no_space.includes("@brief") || no_space.includes("@name"))) {
             to_return.push([comment_block]);
@@ -217,8 +214,15 @@ async function read_fileblock(file) {
             cases_list.splice(0, 1);
             for (var c of cases_list) {
                 var str = c.trim();
-                var split_index = str.indexOf(" ");
-                var case_name = str.substring(0, split_index).replace("\n", '').trim();
+                var split_index, case_name;
+                if (i == 0) {
+                    split_index = str.indexOf(" ");
+                    case_name = str.substring(0, split_index).replace("\n", '').trim();
+                }
+                else {
+                    split_index = str.indexOf("\n");
+                    case_name = str.substring(str.indexOf(" "), split_index).replace("\n", '').trim();
+                }
                 var case_body = str.substring(split_index + 1).trim();
                 if (i == 0)
                     block[case_name] = case_body;
@@ -296,7 +300,7 @@ function to_md(comments, file_name) {
             for (var k of keys) {
                 attribute = comment_block[k];
                 if (k != "brief" && k != "name" && k != "note") {
-                    md_text += `|**${k.replaceAll("\r\n", "<br>")}**|${attribute.replaceAll("\r\n", "\n")}|\n`;
+                    md_text += `|**${k.replaceAll("\r\n", "<br>")}**|${attribute.replaceAll("\r\n", "<br>")}|\n`;
                 }
             }
         }
@@ -304,9 +308,9 @@ function to_md(comments, file_name) {
             for (var code of comment_block['codesnippets']) {
                 var attribute = code[1];
                 var k = code[0];
-                md_text += `### ${k.substring(k.indexOf('(') + 1, k.indexOf(')'))}\n`;
+                md_text += `### ${k}\n`;
                 md_text += "```";
-                md_text += `${file_extension}\n${attribute.replaceAll("\r\n", "\n")}\n`;
+                md_text += `${file_extension}\n${attribute.replaceAll("\r\n", " \n")}\n`;
                 md_text += "```\n";
             }
         }
@@ -330,3 +334,9 @@ function download(text) {
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text + '\ngenerated with [EasyGen](https://github.com/dede-amdp/easygen).'));
     element.setAttribute('download', 'documentation.md');
 }
+
+/*
+    !!TODO:
+        * check why escaping a comment symbol does not protect it from removal
+        * !!BEWARE: THE ONLINE EDITOR DOES NOT SUPPORT <BR> WITHIN TABLES
+ */
