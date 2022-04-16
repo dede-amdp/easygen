@@ -35,6 +35,7 @@
 var files = [];
 const file_sel = document.getElementById('file-selector');
 const files_done = document.getElementById('files-done-par');
+//const hub = document.getElementById('hub');
 const _delimiters = {
     'c': ['/*', '*/', '/', '*'],
     'cpp': ['/*', '*/', '/', '*'],
@@ -60,6 +61,14 @@ file_sel.addEventListener('change', async (event) => {
     document.getElementById("loading").style.display = "block";
     await read_files(files);
 });
+/*hub.ondragover = dropContainer.ondragenter = function (evt) {
+    evt.preventDefault();
+};*/
+/*hub.addEventListener('drop', async (event) => {
+    event.preventDefault();
+    console.log(event);
+    file_sel.files = event.dataTransfer.files;
+});*/
 
 
 

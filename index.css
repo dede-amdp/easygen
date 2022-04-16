@@ -58,6 +58,7 @@ p#files-done-par {
     width: 50%;
     padding-top: 50px;
     padding-bottom: 50px;
+    /*border: #ffffff dotted;*/
 }
 
 #logo {
