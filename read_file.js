@@ -154,6 +154,7 @@ async function read_fileblock(file) {
     var file_blocks_list = {};
     var file_extension = file.name.split('.').pop();
     var blocks_in_file = get_only_comment_blocks(text, _multiline_delimiters[file_extension][0], _multiline_delimiters[file_extension][1]);
+    if (blocks_in_file.length == 0) return "";
     blocks_in_file.forEach(block_text => {
         var block = {}; /*contains all the attributes in a block*/
         var trimmed_text = block_text.trim();
@@ -206,7 +207,7 @@ function remove_comment_symbols(text, comment_symbols) {
 function to_md(comments, file_name) {
     //console.log(comments)
     md_text = "";
-    md_text += `# ${file_name} Description\n`;
+    md_text += `# **${file_name} Description**\n`;
     Object.values(comments).forEach(comment_block => {
         md_text += `## **${comment_block['name']}**\n`;
         md_text += `**${comment_block['brief']}**\n\n`;
@@ -242,7 +243,8 @@ function to_md(comments, file_name) {
 function download(text) {
     document.getElementById("loading").style.display = "none";
     var element = document.getElementById('download-btn');//document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent('<style>*{font-family:\'Consolas ligaturized v2\';}</style>\n' + text));
+    //element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent('<style>*{font-family:\'Consolas ligaturized v2\';}</style>\n' + text));
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text + '\ngenerated with [EasyGen](https://github.com/dede-amdp/easygen).'));
     element.setAttribute('download', 'documentation.md');
 
     /*element.style.display = 'none';

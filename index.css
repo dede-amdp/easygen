@@ -45,7 +45,7 @@ p#files-done-par {
 .loader {
     display: none;
     border: 5px solid #d3d3d3;
-    border-top: 5px solid #2b4e9d;
+    border-top: 5px solid #5ebfbc;
     border-radius: 50%;
     width: 1em;
     height: 1em;
@@ -58,6 +58,19 @@ p#files-done-par {
     width: 50%;
     padding-top: 50px;
     padding-bottom: 50px;
+}
+
+#logo {
+    width: 20vw;
+}
+
+.footer {
+    background-color: #292f36;
+    padding: 2em;
+    color: white;
+}
+a {
+    color: #5ebfbc;
 }
 
 body {
