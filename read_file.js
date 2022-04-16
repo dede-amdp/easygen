@@ -38,9 +38,9 @@ const file_sel = document.getElementById('file-selector');
 const files_done = document.getElementById('files-done-par');
 //const hub = document.getElementById('hub');
 const _delimiters = {
-    'c': ['/*', '*/', '//', '*'],
-    'cpp': ['/*', '*/', '//', '*'],
-    'js': ['/*', '*/', '//', '*'],
+    'c': ['/*', '*/', '//', '/', '*'],
+    'cpp': ['/*', '*/', '//', '/', '*'],
+    'js': ['/*', '*/', '//', '/', '*'],
     'py': ["'''", "#"],
     'm': ["%{", "}%", "%"]
 };
@@ -62,6 +62,7 @@ document.getElementById('supported').innerHTML = Object.keys(_delimiters).map((s
 file_sel.addEventListener('change', async (event) => {
     files = event.target.files;
     document.getElementById("loading").style.display = "block";
+    files_done.innerHTML = '';
     await read_files(files);
 });
 
@@ -126,6 +127,7 @@ function get_only_comment_blocks(text, start_del, end_del, file_extension) {
                     + 1 + end_del.length),
                     file_extension) + end_del;
         }
+        //console.log(comment_block)
         var no_space = comment_block.replaceAll(" ", "");
         if (no_space.includes("@") && (no_space.includes("@brief") || no_space.includes("@name"))) {
             to_return.push([comment_block]);
@@ -206,14 +208,14 @@ async function read_fileblock(file) {
     var file_extension = file.name.split('.').pop();
     var blocks_in_file = get_only_comment_blocks(text, _multiline_delimiters[file_extension][0], _multiline_delimiters[file_extension][1], file_extension);
     if (blocks_in_file.length == 0) return "";
-    blocks_in_file.forEach(block_text => {
+    for (var block_text of blocks_in_file) {
         var block = {}; /*contains all the attributes in a block*/
         for (var i = 0; i < block_text.length; i++) {
             var trimmed_text = block_text[i].trim();
             trimmed_text = remove_comment_symbols(trimmed_text, _delimiters[file_extension]);
             var cases_list = split_by_delimiter(trimmed_text, "@");
             cases_list.splice(0, 1);
-            cases_list.forEach(c => {
+            for (var c of cases_list) {
                 var str = c.trim();
                 var split_index = str.indexOf(" ");
                 var case_name = str.substring(0, split_index).replace("\n", '').trim();
@@ -225,10 +227,10 @@ async function read_fileblock(file) {
                         block['codesnippets'] = [];
                     block['codesnippets'].push([case_name, case_body]);
                 }
-            });
+            }
         }
         file_blocks_list[block['name']] = block;
-    });
+    }
     return to_md(file_blocks_list, file.name);
 }
 
@@ -243,13 +245,22 @@ async function read_fileblock(file) {
 function remove_comment_symbols(text, comment_symbols) {
     var split_text = text.split("\n");
     var new_text = '';
-    split_text.forEach(line => {
+    for (var line of split_text) {
         var str_line = line;
-        comment_symbols.forEach(s => {
+        for (s of comment_symbols) {
             var indexes = indexOfAll(str_line, s);
-        });//str_line = str_line.replace(s, ''));
+            for (var i of indexes) {
+                if (i - 1 >= 0) {
+                    if (text[i - 1] != "\\") {
+                        str_line = str_line.replace(s, '');
+                    }
+                } else {
+                    str_line = str_line.replace(s, '');
+                }
+            }
+        }//str_line = str_line.replace(s, ''));
         new_text += str_line + "\n";
-    });
+    }
     return new_text;
 }
 
@@ -268,11 +279,13 @@ function to_md(comments, file_name) {
     var file_extension = file_name.split('.').pop();
     var md_text = "";
     md_text += `# **${file_name} Description**\n`;
-    Object.values(comments).forEach(comment_block => {
-        md_text += `## **${comment_block['name']}**\n`;
-        md_text += `> ${comment_block['brief']}\n\n`;
+    for (var comment_block of Object.values(comments)) {
+        if ('name' in comment_block)
+            md_text += `## **${comment_block['name']}**\n`;
+        if ('brief' in comment_block)
+            md_text += `> ${comment_block['brief']}\n\n`;
         var keys = Object.keys(comment_block);
-        if (comment_block['note'])
+        if ('note' in comment_block)
             md_text += `${comment_block['note']}\n`;
         for (var i = keys.length - 1; i >= 0; i--) {
             if (keys[i] == "name" || keys[i] == "brief" || keys[i] == "note" || keys[i] == "codesnippets")
@@ -287,15 +300,17 @@ function to_md(comments, file_name) {
                 }
             }
         }
-        for (var code of comment_block['codesnippets']) {
-            var attribute = code[1];
-            var k = code[0];
-            md_text += `### ${k.substring(k.indexOf('(') + 1, k.indexOf(')'))}\n`;
-            md_text += "```";
-            md_text += `${file_extension}\n${attribute.replaceAll("\r\n", "\n")}\n`;
-            md_text += "```\n";
+        if ('codesnippets' in comment_block) {
+            for (var code of comment_block['codesnippets']) {
+                var attribute = code[1];
+                var k = code[0];
+                md_text += `### ${k.substring(k.indexOf('(') + 1, k.indexOf(')'))}\n`;
+                md_text += "```";
+                md_text += `${file_extension}\n${attribute.replaceAll("\r\n", "\n")}\n`;
+                md_text += "```\n";
+            }
         }
-    });
+    }
     md_text += '---\n';
     return md_text;
 }
