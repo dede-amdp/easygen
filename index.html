@@ -1,8 +1,65 @@
 <!DOCTYPE html>
 <html>
 
+<head>
+    <link href="./index.css" rel="stylesheet" />
+</head>
+
 <body>
-    <input type="file" id="file-selector" multiple>
+    <div id="background">
+        <div id="hub" class="center">
+            <img src="./icons/logo_icon.svg" id="logo"></img>
+            <div id="input-div" class="center">
+                <label class="custom-file-upload"><input type="file" id="file-selector" multiple> <img
+                        src="./icons/upload_icon.svg"></img></label><br>
+                Select File<br>
+                <div class="loader center" id="loading"></div><br>
+            </div>
+            <div id="files-done" class="center">
+                <p id="files-done-par" class="center"></p>
+            </div>
+            <div id="'download-div" class="center"><a id="download-btn"><img src="./icons/download_icon.svg"
+                        id="dwnld-img"></img></a><br>
+                Save Generated Documentation</div>
+        </div>
+    </div>
+    <div id="paragraph-div">
+        <p>
+        <h1>❓ What is EasyGen?</h1><br>
+        EasyGen is a automatic generation tool that extracts the comments from the code files you upload and generates
+        documentation automatically!
+        <h1>❓ How do I use EasyGen?</h1><br>
+        It's simple! Just upload the files that contain the code and a documentation file will be automatically
+        generated containing the documentation of all the uploaded files.
+        <h1>⚙️ Instructions</h1><br>
+        To be able to extract the comments from a file, EasyGen needs 2 things:
+        <ul>
+            <li><b>Comment blocks</b>: these comment blocks/ multiline blocks need to contain the info that EasyGen will
+                use;
+            </li>
+            <li><b>Fields</b>: fields are needed to recognize different parts of the information.</li>
+        </ul>
+        All the fields start with a `@` symbol and then are followed by the information you want to write, for
+        example<br>
+        @name method_name
+        @brief this is an example of what you can do
+        @note this is just an example and it is possible to add any other user defined fields
+        @variables
+        - a: something
+        - b: something else
+        the only required fields are `@name` which contains the name of the
+        method that you are describing (or of whatever part of the code is going to be described) and `@brief` which
+        just contains a summary of the method that will is currently being described.<br>
+        Another special field is `@note` which can be used freely to add any information is needed.<br>
+        Lastly, all the other fields (that you can define freely) will be inserted inside a table.<br>
+        <h1>✨ What about the final result?</h1>
+        The output file is a markdown file, so within each field it is possible to use both markdown ad HTML notation to
+        customize anything about the documentation.<br>
+        The supported files for now are <substitute id="supported"></substitute> but others may be added in the future.
+        </p>
+    </div>
+    <div class="footer">Instagram: <a href="https://www.instagram.com/dede.artbit/">@dede.artbit</a><br>Github: <a
+            href="https://github.com/dede-amdp/easygen">dede-adbeat/easygen</a><br>EasyGen 2022</div>
 </body>
 <script src="read_file.js"></script>
 

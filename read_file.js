@@ -4,7 +4,8 @@
  * @note By selecting one or more files, this tool will parse through the files looking for comments blocks **containing at least the \@brief and \@note fields within them**:
  * if a block like that is found, this tool will automatically extract the comment block and insert it into a markdown file formatting it in the following way:
  * # name
- * ** brief ...**
+ * > brief ...
+ * 
  * note ...
  * |Attribute|Description|
  * |:---:|:---|
@@ -27,12 +28,15 @@
  * @variables
  *      - List files: list of files used to create the documentation
  *      - HTMLElement file_sel: file selector HTML element used to select the files
+ *      - HTMLElement files_done: used to show the user which file have been parsed
  *      - JSONObject _delimiters: contains the delimiters of the comments for each language;
  *                                  Put first the delimiters that use more characters (order is important)
  *      - JSONObject _multiline_delimiters: contains the starting and ending delimiters of the multiline comments
  */
 var files = [];
 const file_sel = document.getElementById('file-selector');
+const files_done = document.getElementById('files-done-par');
+//const hub = document.getElementById('hub');
 const _delimiters = {
     'c': ['/*', '*/', '/', '*'],
     'cpp': ['/*', '*/', '/', '*'],
@@ -46,6 +50,8 @@ const _multiline_delimiters = {
     'py': ["'''", "'''"]
 };
 
+document.getElementById('supported').innerHTML = Object.keys(_delimiters).map((str) => ` \`${str}\``);
+
 /**
  * @name ChangeEventListener
  * @brief Event listener attached to the file_sel variable to read the files once they are selected and loaded
@@ -53,8 +59,17 @@ const _multiline_delimiters = {
  */
 file_sel.addEventListener('change', async (event) => {
     files = event.target.files;
+    document.getElementById("loading").style.display = "block";
     await read_files(files);
 });
+/*hub.ondragover = dropContainer.ondragenter = function (evt) {
+    evt.preventDefault();
+};*/
+/*hub.addEventListener('drop', async (event) => {
+    event.preventDefault();
+    console.log(event);
+    file_sel.files = event.dataTransfer.files;
+});*/
 
 
 
@@ -125,9 +140,16 @@ function split_by_delimiter(text, del) {
 async function read_files(files) {
     var text = '';
     for (var f of Object.values(files)) {
-        text += await read_fileblock(f);
+        var file_extension = f.name.split('.').pop();
+        if ((file_extension in _delimiters)) {
+            text += await read_fileblock(f);
+            files_done.innerHTML += `✔️ ${f.name}<br>`;
+        } else {
+            files_done.innerHTML += `❌ ${f.name}<br>`;
+        }
     }
-    download(text); //!! THIS IS IMPORTANT, REMEMBER TO DECOMMENT
+    files_done.innerHTML += `<br><div class="center">✔️ Your Docs are ready!<div><br>`;
+    download(text);
 }
 
 /**
@@ -142,6 +164,7 @@ async function read_fileblock(file) {
     var file_blocks_list = {};
     var file_extension = file.name.split('.').pop();
     var blocks_in_file = get_only_comment_blocks(text, _multiline_delimiters[file_extension][0], _multiline_delimiters[file_extension][1]);
+    if (blocks_in_file.length == 0) return "";
     blocks_in_file.forEach(block_text => {
         var block = {}; /*contains all the attributes in a block*/
         var trimmed_text = block_text.trim();
@@ -194,10 +217,10 @@ function remove_comment_symbols(text, comment_symbols) {
 function to_md(comments, file_name) {
     //console.log(comments)
     md_text = "";
-    md_text += `# ${file_name} Description\n`;
+    md_text += `# **${file_name} Description**\n`;
     Object.values(comments).forEach(comment_block => {
         md_text += `## **${comment_block['name']}**\n`;
-        md_text += `**${comment_block['brief']}**\n\n`;
+        md_text += `> ${comment_block['brief']}\n\n`;
         var keys = Object.keys(comment_block);
         if (comment_block['note'])
             md_text += `${comment_block['note']}\n`;
@@ -215,7 +238,7 @@ function to_md(comments, file_name) {
             }
         }
     });
-    md_text += '---';
+    md_text += '---\n';
     return md_text;
 }
 
@@ -228,14 +251,16 @@ function to_md(comments, file_name) {
  * @returns None
  */
 function download(text) {
-    var element = document.createElement('a');
-    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent('<style>*{font-family:\'Consolas ligaturized v2\';}</style>\n' + text));
+    document.getElementById("loading").style.display = "none";
+    var element = document.getElementById('download-btn');//document.createElement('a');
+    //element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent('<style>*{font-family:\'Consolas ligaturized v2\';}</style>\n' + text));
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text + '\ngenerated with [EasyGen](https://github.com/dede-amdp/easygen).'));
     element.setAttribute('download', 'documentation.md');
 
-    element.style.display = 'none';
+    /*element.style.display = 'none';
     document.body.appendChild(element);
 
     element.click();
 
-    document.body.removeChild(element);
+    document.body.removeChild(element);*/
 }
