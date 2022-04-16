@@ -2,5 +2,5 @@
 /backup
 /node_modules
 out/
-./package-lock.json
-./package.json
+package-lock.json
+package.json
