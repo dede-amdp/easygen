@@ -1,44 +1,50 @@
-*{
-    font-family:'Consolas ligaturized v2';
+* {
+    font-family: "Consolas ligaturized v2";
 }
 
 .center {
     margin: auto;
     margin-left: auto;
     margin-right: auto;
-    width: 50%;
+    /*width: 50%;*/
     height: 50%;
-    text-align: center;
     vertical-align: middle;
-    /*border: 3px solid green;*/
     padding: 10px;
 }
 
-img{
+img {
     width: 2.2em;
-    cursor:pointer;
+    cursor: pointer;
 }
-img#dwnld-img{
+img#dwnld-img {
     width: 3em;
 }
 
-#custom-file-upload{
-    display:block;
+#custom-file-upload {
+    display: block;
 }
 
-#file-selector{
-    display:none;
+#file-selector {
+    display: none;
 }
 
-#paragraph-div{
-    padding:40%;
-    text-align:left;
+#paragraph-div {
+    /*padding: 40%;*/
+    text-align: left;
+    width: 80%;
+    margin: auto;
+    margin-bottom: 80px;
+}
+
+p#files-done-par {
+    display: inline-block;
+    text-align: left;
 }
 
 /*Loader*/
 .loader {
-    display:none;
-    border: 5px solid #D3D3D3;
+    display: none;
+    border: 5px solid #d3d3d3;
     border-top: 5px solid #2b4e9d;
     border-radius: 50%;
     width: 1em;
@@ -46,11 +52,29 @@ img#dwnld-img{
     animation: spin 2s linear infinite;
 }
 
-#hub{
-    border: 3px solid #2b4e9d;
+#hub {
+    /*border: 3px solid #2b4e9d;*/
+    text-align: center;
+    width: 50%;
+    padding-top: 50px;
+    padding-bottom: 50px;
+}
+
+body {
+    margin: unset;
+}
+
+div#background {
+    background-color: #292f36;
+    color: white;
+    margin: unset;
 }
 
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }

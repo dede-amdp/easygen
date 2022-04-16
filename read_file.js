@@ -27,12 +27,14 @@
  * @variables
  *      - List files: list of files used to create the documentation
  *      - HTMLElement file_sel: file selector HTML element used to select the files
+ *      - HTMLElement files_done: used to show the user which file have been parsed
  *      - JSONObject _delimiters: contains the delimiters of the comments for each language;
  *                                  Put first the delimiters that use more characters (order is important)
  *      - JSONObject _multiline_delimiters: contains the starting and ending delimiters of the multiline comments
  */
 var files = [];
 const file_sel = document.getElementById('file-selector');
+const files_done = document.getElementById('files-done-par');
 const _delimiters = {
     'c': ['/*', '*/', '/', '*'],
     'cpp': ['/*', '*/', '/', '*'],
@@ -45,6 +47,8 @@ const _multiline_delimiters = {
     'js': ['/*', '*/'],
     'py': ["'''", "'''"]
 };
+
+document.getElementById('supported').innerHTML = Object.keys(_delimiters).map((str) => ` \`${str}\``);
 
 /**
  * @name ChangeEventListener
@@ -126,9 +130,16 @@ function split_by_delimiter(text, del) {
 async function read_files(files) {
     var text = '';
     for (var f of Object.values(files)) {
-        text += await read_fileblock(f);
+        var file_extension = f.name.split('.').pop();
+        if ((file_extension in _delimiters)) {
+            text += await read_fileblock(f);
+            files_done.innerHTML += `✔️ ${f.name}<br>`;
+        } else {
+            files_done.innerHTML += `❌ ${f.name}<br>`;
+        }
     }
-    download(text); //!! THIS IS IMPORTANT, REMEMBER TO DECOMMENT
+    files_done.innerHTML += `<br><div class="center">✔️ Your Docs are ready!<div><br>`;
+    download(text);
 }
 
 /**
@@ -216,7 +227,7 @@ function to_md(comments, file_name) {
             }
         }
     });
-    md_text += '---';
+    md_text += '---\n';
     return md_text;
 }
 
