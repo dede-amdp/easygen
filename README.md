@@ -1,17 +1,16 @@
-<style>*{font-family:'Consolas ligaturized v2';}</style>
-
-# read_file.js Description
+# **read_file.js Description**
 
 ## **Introduction**
 
-**This tool can be used to generate documentation starting from the comments written into a coding file.**
+> This tool can be used to generate documentation starting from the comments written into a coding file.
 
-By selecting one or more files, this tool will parse through the files looking for comments blocks **containing at least the \@brief and \@name fields within them**:
+By selecting one or more files, this tool will parse through the files looking for comments blocks **containing at least the \@brief and \@note fields within them**:
 if a block like that is found, this tool will automatically extract the comment block and insert it into a markdown file formatting it in the following way:
 
 # name
 
-** brief ...**
+> brief ...
+
 note ...
 |Attribute|Description|
 |:---:|:---|
@@ -19,6 +18,7 @@ note ...
 |attribute name|attribute description|
 ...
 |attribute name|attribute description|
+
 \-\-\- <- line
 
 If more than one file is provided, each file will be parsed and concatenated to the previous one, but each file "section" will start with its name.
@@ -28,21 +28,21 @@ Because the output file is a markdown file, markdown syntax and HTML can be used
 
 ## **Definitions**
 
-**These are the variable definitions for the file**
+> These are the variable definitions for the file
 
-|   Attribute   | Description                                                                                                                                  |
-| :-----------: | :------------------------------------------------------------------------------------------------------------------------------------------- |
-| **variables** | - List files: list of files used to create the documentation<br> - HTMLElement file_sel: file selector HTML element used to select the files |
+|   Attribute   | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| :-----------: | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **variables** | - List files: list of files used to create the documentation<br> - HTMLElement file_sel: file selector HTML element used to select the files<br> - HTMLElement files_done: used to show the user which file have been parsed<br> - JSONObject \_delimiters: contains the delimiters of the comments for each language;<br> Put first the delimiters that use more characters (order is important)<br> - JSONObject \_multiline_delimiters: contains the starting and ending delimiters of the multiline comments |
 
 ## **ChangeEventListener**
 
-**Event listener attached to the file_sel variable to read the files once they are selected and loaded**
+> Event listener attached to the file_sel variable to read the files once they are selected and loaded
 
 The event listener uses the read method to read the files and extract from them the documentation.
 
 ## **get_only_comment_blocks**
 
-**extracts only the block comments from the file**
+> extracts only the block comments from the file
 
 |   Attribute   | Description                                                                                                                                                                      |
 | :-----------: | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -51,7 +51,7 @@ The event listener uses the read method to read the files and extract from them 
 
 ## **split_by_delimiter**
 
-**splits a comment block by using a delimiter (if not escaped)**
+> splits a comment block by using a delimiter (if not escaped)
 
 |   Attribute   | Description                                                                                    |
 | :-----------: | :--------------------------------------------------------------------------------------------- |
@@ -60,7 +60,7 @@ The event listener uses the read method to read the files and extract from them 
 
 ## **async read_files**
 
-**reads and parses all the files in a file list and then starts the download of the documentation extracted from them**
+> reads and parses all the files in a file list and then starts the download of the documentation extracted from them
 
 |   Attribute   | Description                                 |
 | :-----------: | :------------------------------------------ |
@@ -69,7 +69,7 @@ The event listener uses the read method to read the files and extract from them 
 
 ## **async read_fileblock**
 
-**finds the comment blocks inside the file and uses them to create a markdown file for documentation**
+> finds the comment blocks inside the file and uses them to create a markdown file for documentation
 
 |   Attribute   | Description                                                     |
 | :-----------: | :-------------------------------------------------------------- |
@@ -78,7 +78,7 @@ The event listener uses the read method to read the files and extract from them 
 
 ## **remove_comment_symbols**
 
-**removes all the useless comment symbols within a comment block**
+> removes all the useless comment symbols within a comment block
 
 |   Attribute   | Description                                                                                                        |
 | :-----------: | :----------------------------------------------------------------------------------------------------------------- |
@@ -87,7 +87,7 @@ The event listener uses the read method to read the files and extract from them 
 
 ## **to_md**
 
-**create a markdown file containing the extracted documentation**
+> create a markdown file containing the extracted documentation
 
 the function goes through the comment blocks previously read and parsed (via the read_fileblock method) and
 it builds step by step a file containing all the information of the comment block: this lets the use write only the comments
@@ -99,7 +99,7 @@ on a file and afterwards the user can write automatically the documentation usin
 
 ## **download**
 
-**this method download the documentation built with this tool**
+> this method download the documentation built with this tool
 
 this method simply creates an `a` HTMLElement to download the text that then gets destroyed (leaving the dom untouched)
 |Attribute|Description|
@@ -108,3 +108,5 @@ this method simply creates an `a` HTMLElement to download the text that then get
 |**returns**|None|
 
 ---
+
+generated with [EasyGen](https://github.com/dede-amdp/easygen).

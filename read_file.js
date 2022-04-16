@@ -4,7 +4,8 @@
  * @note By selecting one or more files, this tool will parse through the files looking for comments blocks **containing at least the \@brief and \@note fields within them**:
  * if a block like that is found, this tool will automatically extract the comment block and insert it into a markdown file formatting it in the following way:
  * # name
- * ** brief ...**
+ * > brief ...
+ * 
  * note ...
  * |Attribute|Description|
  * |:---:|:---|
@@ -219,7 +220,7 @@ function to_md(comments, file_name) {
     md_text += `# **${file_name} Description**\n`;
     Object.values(comments).forEach(comment_block => {
         md_text += `## **${comment_block['name']}**\n`;
-        md_text += `**${comment_block['brief']}**\n\n`;
+        md_text += `> ${comment_block['brief']}\n\n`;
         var keys = Object.keys(comment_block);
         if (comment_block['note'])
             md_text += `${comment_block['note']}\n`;
