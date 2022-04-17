@@ -42,7 +42,7 @@ const _delimiters = {
     'cpp': ['/*', '*/', '//', '/', '*'],
     'js': ['/*', '*/', '//', '/', '*'],
     'py': ["'''", "'", "#"],
-    'm': ["%{", "}%", "%"]
+    'm': ["%{", "}%", "{", "}", "%"]
 };
 const _multiline_delimiters = {
     'c': ['/*', '*/'],
@@ -69,14 +69,14 @@ file_sel.addEventListener('change', async (event) => {
 
 function indexOfAll(str, pattern) {
     var indexes = [];
-    var to_check = str;
+    var to_check = str.substring(0);
     var i, n;
     while (to_check.length > 0) {
         n = indexes.length;
         i = to_check.indexOf(pattern);
         if (i < 0) break;
         if (n > 0)
-            indexes.push(indexes[n + 1] + i);
+            indexes.push(indexes[n - 1] - 1 + i);
         else
             indexes.push(i);
         to_check = to_check.substring(i + 1);
@@ -223,7 +223,8 @@ async function read_fileblock(file) {
                     split_index = str.indexOf("\n");
                     case_name = str.substring(str.indexOf(" "), split_index).replace("\n", '').trim();
                 }
-                var case_body = str.substring(split_index + 1).trim();
+                var case_body = str.substring(split_index + 1);
+                if (i == 0) case_body = case_body.trim();
                 if (i == 0)
                     block[case_name] = case_body;
                 else {
@@ -254,15 +255,11 @@ function remove_comment_symbols(text, comment_symbols) {
         for (s of comment_symbols) {
             var indexes = indexOfAll(str_line, s);
             for (var i of indexes) {
-                if (i - 1 >= 0) {
-                    if (text[i - 1] != "\\") {
-                        str_line = str_line.replace(s, '');
-                    }
-                } else {
-                    str_line = str_line.replace(s, '');
-                }
+                console.log(str_line.substring(0, i))
+                if (str_line[i - 1] == '\\') continue;
+                str_line = str_line.substring(0, i - 1) + str_line.substring(i + s.length);
             }
-        }//str_line = str_line.replace(s, ''));
+        }
         new_text += str_line + "\n";
     }
     return new_text;
@@ -280,6 +277,7 @@ function remove_comment_symbols(text, comment_symbols) {
  * @returns String containing the documentation for the file
  */
 function to_md(comments, file_name) {
+    console.log(comments);
     var file_extension = file_name.split('.').pop();
     var md_text = "";
     md_text += `# **${file_name} Description**\n`;
@@ -337,6 +335,6 @@ function download(text) {
 
 /*
     !!TODO:
-        * check why escaping a comment symbol does not protect it from removal
+        * remove escape char in code snippets (maybe de-escape method?)
         * !!BEWARE: THE ONLINE EDITOR DOES NOT SUPPORT <BR> WITHIN TABLES
  */
