@@ -58,18 +58,18 @@ using the file extension the method looks for comment symbols and escapes them s
 |**variables**|- String text: file text<br>        - String start_del: delimiter used to find the start of the comment block<br>        - String end_del: delimiter used to find the end of the comment block|
 |**returns**|String List containing only the comment blocks|
 ### include code snippets
-```js        // it uses the code delimiters @codestart and @codeend (contained in the variable code_del) to check where the code 
+```js        // it uses the code delimiters \@codestart and \@codeend (contained in the variable code_del) to check where the code 
         // snippet is located 
         if (comment_block.includes(code_del[0])) { 
             // there is a code snippet to be considered 
-            if (comment_block[comment_block.indexOf(code_del[0]) - 1] != '') { 
+            if (comment_block[comment_block.indexOf(code_del[0]) - 1] != '\\') { 
                 var delimiter_pos = -1; 
                 var sub_to_check = to_check.substring(0); 
                 while (sub_to_check.indexOf(code_del[1]) > -1) { 
                     var ind = sub_to_check.indexOf(code_del[1]); 
                     if (delimiter_pos < 0) delimiter_pos = ind; 
                     else delimiter_pos += ind; 
-                    if (sub_to_check[ind - 1] != "") break; 
+                    if (sub_to_check[ind - 1] != "\\") break; 
                     delimiter_pos += code_del[1].length; 
                     sub_to_check = to_check.substring(delimiter_pos); 
                 } 
@@ -79,7 +79,7 @@ using the file extension the method looks for comment symbols and escapes them s
                 comment_block = comment_block.substring(0, comment_block.lastIndexOf(start_del) + start_del.length).trim(); 
                 var end_name = start_del.length + comment_block.substring(start_del.length).indexOf(end_del); 
                 var end_all = end_name + end_del.length + comment_block.substring(end_name + end_del.length).lastIndexOf(start_del); 
-                comment_block = comment_block.substring(0, end_name) + "n" + comment_block.substring(end_name + end_del.length, end_all) + end_del; //escape_string around the second string 
+                comment_block = comment_block.substring(0, end_name) + "\n" + comment_block.substring(end_name + end_del.length, end_all) + end_del; //escape_string around the second string 
             } 
         }
 ```

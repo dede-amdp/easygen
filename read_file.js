@@ -366,7 +366,7 @@ function to_md(comments, file_name) {
                 var k = code[0];
                 md_text += `### ${k}\n`;
                 md_text += "```";
-                md_text += `${file_extension}${de_escape(attribute).replaceAll("\r\n", " \n")}\n`;
+                md_text += `${file_extension}${attribute.replaceAll("\r\n", " \n")}\n`;//de_escape(attribute).replaceAll("\r\n", " \n")}\n`;
                 md_text += "```\n";
             }
         }
