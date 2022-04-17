@@ -76,7 +76,7 @@ function indexOfAll(str, pattern) {
         i = to_check.indexOf(pattern);
         if (i < 0) break;
         if (n > 0)
-            indexes.push(indexes[n - 1] - 1 + i);
+            indexes.push(indexes[n - 1] + i);
         else
             indexes.push(i);
         to_check = to_check.substring(i + 1);
@@ -255,13 +255,18 @@ function remove_comment_symbols(text, comment_symbols) {
         for (s of comment_symbols) {
             var indexes = indexOfAll(str_line, s);
             for (var i of indexes) {
-                console.log(str_line.substring(0, i))
                 if (str_line[i - 1] == '\\') continue;
-                str_line = str_line.substring(0, i - 1) + str_line.substring(i + s.length);
+                str_line = str_line.substring(0, i) + str_line.substring(i + s.length);
             }
         }
         new_text += str_line + "\n";
     }
+    return new_text;
+}
+
+
+function de_escape(text) {
+    new_text = text.substring(0).replaceAll("\\", "");
     return new_text;
 }
 
@@ -277,7 +282,6 @@ function remove_comment_symbols(text, comment_symbols) {
  * @returns String containing the documentation for the file
  */
 function to_md(comments, file_name) {
-    console.log(comments);
     var file_extension = file_name.split('.').pop();
     var md_text = "";
     md_text += `# **${file_name} Description**\n`;
@@ -308,7 +312,7 @@ function to_md(comments, file_name) {
                 var k = code[0];
                 md_text += `### ${k}\n`;
                 md_text += "```";
-                md_text += `${file_extension}\n${attribute.replaceAll("\r\n", " \n")}\n`;
+                md_text += `${file_extension}\n${de_escape(attribute).replaceAll("\r\n", " \n")}\n`;
                 md_text += "```\n";
             }
         }
