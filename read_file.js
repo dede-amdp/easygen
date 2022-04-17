@@ -46,6 +46,7 @@ const code_del = ["@codestart", "@codeend"];
 const field_delimiter = "@";
 const _delimiters = {
     'c': ['/*', '*/', '//', '/', '*'],
+    'cs': ['/*', '*/', '//', '/', '*'],
     'cpp': ['/*', '*/', '//', '/', '*'],
     'js': ['/*', '*/', '//', '/', '*'],
     'py': ["'''", "'", "#"],
@@ -53,6 +54,7 @@ const _delimiters = {
 };
 const _multiline_delimiters = {
     'c': ['/*', '*/'],
+    'cs': ['/*', '*/'],
     'cpp': ['/*', '*/'],
     'js': ['/*', '*/'],
     'py': ["'''", "'''"],
