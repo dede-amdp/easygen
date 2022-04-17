@@ -3,6 +3,10 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width">
+    <meta name="description" content="Free only documentation extraction from code comments in files">
+    <meta name="keywords" content="HTML, CSS, JavaScript, Coding, Documentation, Automatic, Generation, Extraction">
+    <meta name="author" content="dede.artbit">
     <title>EasyGen</title>
     <link href="./index.css" rel="stylesheet" />
 </head>
@@ -10,10 +14,11 @@
 <body>
     <div id="background">
         <div id="hub" class="center">
-            <img src="./icons/logo_icon.svg" id="logo"></img>
+            <img src="./icons/logo_icon.svg" id="logo" alt="EasyGen"></img>
             <div id="input-div" class="center">
                 <label class="custom-file-upload"><input type="file" id="file-selector" multiple> <img
-                        src="./icons/upload_icon.svg"></img></label><br>
+                        src="./icons/upload_icon.svg" id="load-icon"
+                        alt="Click here to select the files to upload"></img></label><br>
                 Select Files<br>
                 <div class="loader center" id="loading"></div><br>
             </div>
@@ -21,7 +26,8 @@
                 <p id="files-done-par" class="center"></p>
             </div>
             <div id="'download-div" class="center"><a id="download-btn"><img src="./icons/download_icon.svg"
-                        id="dwnld-img"></img></a><br>
+                        id="dwnld-img"
+                        alt="click here once the extraction is done to download the documentation"></img></a><br>
                 Save Generated Documentation</div>
         </div>
     </div>
@@ -43,17 +49,35 @@
         </ul>
         All the fields start with a `@` symbol and then are followed by the information you want to write, for
         example<br><br>
-        <code>@name method_name<br>
+        <div class="code"><code>@name method_name<br>
         @brief this is an example of what you can do<br>
         @note this is just an example and it is possible to add any other user defined fields<br>
         @variables<br>
         - a: something<br>
-        - b: something else</code><br><br>
-        the only required fields are `@name` which contains the name of the
-        method that you are describing (or of whatever part of the code is going to be described) and `@brief` which
-        just contains a summary of the method that is currently being described.<br>
-        Another special field is `@note` which can be used freely to add any information is needed.<br>
+        - b: something else</code></div><br><br>
+        the only required fields is the `@name` field which contains the name of the
+        method that you are describing (or of whatever part of the code is going to be described).<br>
+        Other special fields are `@brief` that contains a summary what is described and `@note` which can be used freely
+        to add any information is needed.<br>
         Lastly, all the other fields (that you can define freely) will be inserted inside a table.<br>
+        <h1>👨‍💻 Code Snippets!</h1>
+        Code snippets can be added by using the `@codestart` and `@codeend` fields (always between multiline comment
+        blocks): the `@codestart`, followed by the
+        name of the code snippet, has to be put before the code section that you want to include, the `@codeend` field
+        has to be put at the end of the code section. Within these sections, comments can be inserted as normal to
+        explain the function of the code.
+        There can be multiple code snippets (with different names) and they will considered as part of the comment block
+        that precedes them.<br>
+        This is an example of how to use it:<br><br>
+        <div class="code"><code>
+            /*@codestart name1*/<br>
+            //this is the code that will be inserted<br>
+            for(int i = 0; i < 10; i++){<br>
+                console.log("<3\n");<br>
+            }<br>
+            /*@codeend*/<br>
+        </code>
+        </div>
         <h1>✨ What about the final result?</h1>
         The output file is a markdown file, so within each field it is possible to use both markdown ad HTML notation to
         customize anything about the documentation.<br>
