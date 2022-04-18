@@ -63,8 +63,10 @@ npm start
 var files = [];
 const file_sel = document.getElementById('file-selector');
 const files_done = document.getElementById('files-done-par');
-const code_del = ["@codestart", "@codeend"];
-const field_delimiter = "@";
+const code_del = ["\@codestart", "\@codeend"];
+const field_delimiter = "\@";
+/*@codestart delimiters*/
+// _delimiters contains all the comment symbols
 const _delimiters = {
     'c': ['/*', '*/', '//', '/', '*'],
     'cs': ['/*', '*/', '//', '/', '*'],
@@ -74,6 +76,7 @@ const _delimiters = {
     'py': ["'''", "'", "#"],
     'm': ["%{", "}%", "{", "}", "%"]
 };
+// _multiline_delimiters contains only the multiline comments symbols
 const _multiline_delimiters = {
     'c': ['/*', '*/'],
     'cs': ['/*', '*/'],
@@ -83,6 +86,7 @@ const _multiline_delimiters = {
     'py': ["'''", "'''"],
     'm': ["%{", "}%"]
 };
+/*@codeend*/
 
 document.getElementById('supported').innerHTML = Object.keys(_delimiters).map((str) => ` \`${str}\``);
 
