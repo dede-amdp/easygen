@@ -36,6 +36,15 @@ npm start
 ```
 # Contributing
 You are free to clone and modify the repository, I archived the repo just because I don't know how to use github (no joke, I wouldn't know how to manage pull requests etc...)
+
+# Edits
+The tool is easily configurable, just add the comment symbols (both the comment block symbols and single line comment symbols) to the `_delimites` and `_multiline_delimiters` variables with key equal to the extension of the file you want to add support to, by doing so the app will automatically be able to recognize comment blocks and extract documentation from them.
+
+# How to Start the app
+Just use this command within the cloned repo or find the `out` folder and find the executable file.
+```console
+npm start
+```
  */
 
 /*
@@ -61,6 +70,7 @@ const _delimiters = {
     'cs': ['/*', '*/', '//', '/', '*'],
     'cpp': ['/*', '*/', '//', '/', '*'],
     'js': ['/*', '*/', '//', '/', '*'],
+    'java': ['/*', '*/', '//', '/', '*'],
     'py': ["'''", "'", "#"],
     'm': ["%{", "}%", "{", "}", "%"]
 };
@@ -69,6 +79,7 @@ const _multiline_delimiters = {
     'cs': ['/*', '*/'],
     'cpp': ['/*', '*/'],
     'js': ['/*', '*/'],
+    'java': ['/*', '*/'],
     'py': ["'''", "'''"],
     'm': ["%{", "}%"]
 };
