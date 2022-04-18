@@ -24,6 +24,18 @@ If more than one file is provided, each file will be parsed and concatenated to 
 Right now this tool supports the C style comments, python comments and MATLAB comments but in future it might support other languages.
 
 Because the output file is a markdown file, markdown syntax and HTML can be used as well within the comments (it all depends on the software used to read the files).
+
+# Installation
+If you want to create a desktop app for your personal use, just use this:
+
+```console
+git clone https://github.com/dede-amdp/easygen.git
+cd easygen
+npm install
+npm start
+```
+# Contributing
+You are free to clone and modify the repository, I archived the repo just because I don't know how to use github (no joke, I wouldn't know how to manage pull requests etc...)
  */
 
 /*
