@@ -67,6 +67,7 @@ const code_del = ["\@codestart", "\@codeend"];
 const field_delimiter = "\@";
 /*@codestart delimiters*/
 // _delimiters contains all the comment symbols
+// !! IMPORTANT: Add the symbols with more characters first! (Order is important)
 const _delimiters = {
     'c': ['/*', '*/', '//', '/', '*'],
     'cs': ['/*', '*/', '//', '/', '*'],

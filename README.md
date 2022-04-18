@@ -54,6 +54,7 @@ npm start
 |**variables**|- List files: list of files used to create the documentation<br>        - HTMLElement file_sel: file selector HTML element used to select the files<br>        - HTMLElement files_done: used to show the user which file have been parsed<br>        - String List code_del: contains the code snippet delimiters `\@codestart` and `\@codeend`<br>        - String field_delimiter: contains the fields delimiter `\@`<br>        - JSONObject _delimiters: contains the delimiters of the comments for each language;<br>                                    Put first the delimiters that use more characters (order is important)<br>        - JSONObject _multiline_delimiters: contains the starting and ending delimiters of the multiline comments|
 ### delimiters
 ```js// _delimiters contains all the comment symbols 
+// !! IMPORTANT: Add the symbols with more characters first! (Order is important) 
 const _delimiters = { 
     'c': ['/*', '*/', '//', '/', '*'], 
     'cs': ['/*', '*/', '//', '/', '*'], 
