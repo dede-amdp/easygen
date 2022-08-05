@@ -1,4 +1,5 @@
 /*
+#@
 @name: EasyGen
 @notes: EasyGen can be used to extract comments and generate documentation from any code file. To use it, just add in **multiline comments** the characters `#@` to start the documentation section and `@#` to end it.
 Within the start and end symbols, **fields** can be defined by using _tags_: each tag is defined by using the `@` character followed by a string without spaces and ended with the `:` character, after which the contents of the field can be added.
@@ -9,6 +10,7 @@ There are special tags that behave in a specific way:
 * inputs/outputs: used to describe the inputs and the outputs of a method.
 Other tags can be used and their contents will be added to a table.
 Code snippets can be added to the documentation by using the `#@codestart@# and `#@codeend@#` symbols, used to indicate which part of the code has to be included as snippets in the documentation.
+@#
 */
 
 /*
