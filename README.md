@@ -11,7 +11,7 @@ EasyGen can be used to extract comments and generate documentation from any code
  * notes: can be used to explain in detail the section taken into consideration;
  * inputs/outputs: used to describe the inputs and the outputs of a method.
  Other tags can be used and their contents will be added to a table.
- Code snippets can be added to the documentation by using the `#@codestart@# and `#@codeend@#` symbols, used to indicate which part of the code has to be included as snippets in the documentation.
+ Code snippets can be added to the documentation by using the `#@codestart@#` and `#@codeend@#` symbols, used to indicate which part of the code has to be included as snippets in the documentation.
 
  
 
