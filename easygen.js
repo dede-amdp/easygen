@@ -10,6 +10,23 @@ There are special tags that behave in a specific way:
 * inputs/outputs: used to describe the inputs and the outputs of a method.
 Other tags can be used and their contents will be added to a table.
 Code snippets can be added to the documentation by using the `#@codestart@#` and `#@codeend@#` symbols, used to indicate which part of the code has to be included as snippets in the documentation.
+## Installation
+If you want to create a desktop app for your personal use, just use this:
+
+```console
+git clone https://github.com/dede-amdp/easygen.git
+cd easygen
+npm install
+npm start
+```
+## Contributing
+You are free to clone and modify the repository, I archived the repo just because I don't know how to use github (no joke, I wouldn't know how to manage pull requests etc...)
+
+## How to Start the app
+Just use this command within the cloned repo or find the `out` folder and find the executable file.
+```console
+npm start
+```
 @#
 */
 
