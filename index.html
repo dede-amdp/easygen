@@ -47,36 +47,49 @@
             </li>
             <li><b>Fields</b>: fields are needed to recognize different parts of the information.</li>
         </ul>
-        All the fields start with a `@` symbol and a field name, followed by the information you want to write, for
-        example<br><br>
-        <div class="code"><code>@name method_name<br>
-        @brief this is an example of what you can do<br>
-        @note this is just an example and it is possible to add any other user defined fields<br>
-        @variables<br>
+        All the fields are contained between two starting and ending symbols that define a section: `#@` to show where
+        the section starts and `@#` to show where it ends. Please be careful to always have a space between the
+        multiline comments symbols of the programming language you are using and the starting and ending symbols used to
+        define the documentation section: this will ensure that the symbols will be recognized and not confused with
+        another symbol fusion of the comment symbol and the section one.<br>
+        Each section is made of fields, defined by using a tag: each tag starts with a `@` symbol and a field name (with
+        no spaces) ending with `:`, followed by the information you want to write, for
+        example:<br><br>
+        <div class="code"><code>@name: method_name<br>
+        @brief :this is an example of what you can do<br>
+        @notes: this is just an example and it is possible to add any other user defined fields<br>
+        @inputs:<br>
         - a: something<br>
         - b: something else</code></div><br><br>
-        the only required fields is the `@name` field which contains the name of the
-        method that you are describing (or of whatever part of the code is going to be described).<br>
-        Other special fields are `@brief` that contains a summary of what is described and `@note` which can be used
-        freely
-        to add any information is needed.<br>
-        Lastly, all the other fields (that you can define freely) will be inserted inside a table.<br>
+        There are some special fields that will be formatted in specific ways, such as:
+        <ul>
+            <li>name: used to state the name of the section that is being defined, like the name of a method, a class,
+                etc...;</li>
+            <li>brief: used for a summary of what the section described does;</li>
+            <li>notes: used to write more detailed information;</li>
+            <li>inputs: used to describe the inputs to a function;</li>
+            <li>outputs: used to describe the output values;</li>
+        </ul>
+        other tags can be created by the user by simply writing a custom tag (REMEMBER: don't use spaces), the contents
+        of these field will be added to a table.<br>
         <h1>👨‍💻 Code Snippets!</h1>
-        Code snippets can be added by using the `@codestart` and `@codeend` fields (always between multiline comment
-        blocks): the `@codestart`, followed by the
-        name of the code snippet, has to be put before the code section that you want to include, the `@codeend` field
-        has to be put at the end of the code section. Within these sections, comments can be inserted as normal to
-        explain the function of the code.
-        There can be multiple code snippets (with different names) and they will considered as part of the comment block
+        Code snippets can be added by using the `#@codestart@#` and `#@codeend@#` fields (always within a multiline
+        comment block): the `#@codestart@#` has to be put before the code section that you want to include, the
+        `#@codeend@#`
+        field has to be put at the end of the code section. Within these sections, comments can be inserted as normal to
+        explain the behaviour of the code. As for the `#@` and `@#` symbols, please ensure that the code snippets
+        symbols are separated from the comment block symbols with at least a space, otherwise they will not be
+        recognized correctly.
+        There can be multiple code snippets and they will be considered as part of the comment block
         that precedes them.<br>
         This is an example of how to use it:<br><br>
         <div class="code"><code>
-            /*@codestart name1*/<br>
+            /* #@codestart@# */<br>
             //this is the code that will be inserted<br>
             for(var i = 0; i < 10; i++){<br>
                 console.log("<3\n");<br>
             }<br>
-            /*@codeend*/<br>
+            /* #@codeend@# */<br>
         </code>
         </div>
         <h1>✨ What about the final result?</h1>
@@ -88,6 +101,8 @@
     <div class="footer">Instagram: <a href="https://www.instagram.com/dede.artbit/">@dede.artbit</a><br>Github: <a
             href="https://github.com/dede-amdp/easygen">dede-amdp/easygen</a><br>EasyGen 2022</div>
 </body>
-<script src="read_file.js"></script>
+<script src="./res/lexer.js"></script>
+<script src="./res/format.js"></script>
+<script src="./easygen.js"></script>
 
 </html>
