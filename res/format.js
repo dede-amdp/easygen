@@ -30,5 +30,5 @@ function format_other(tag, content) {
     for (let word of tag.split(" ")) {
         name += word[0].toUpperCase() + word.slice(1) + " ";
     }
-    return `\n|**${name.trim()}**|${content}|`;
+    return `|**${name.trim()}**|${content}|`;
 }
