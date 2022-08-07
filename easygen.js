@@ -121,7 +121,7 @@ function generate_docs(string) {
                 if (field.substring(0, field.length - 1) == "_code_snippet_") {
                     description += format_code(fields[field]) + "\n";
                 } else {
-                    if (table == "") table = `|Field Name|Description|\n|:---:|:---:|`;
+                    if (table == "") table = `|Field Name|Description|\n|:---:|:---:|\n`;
                     table += format_other(field, fields[field]) + "\n";
                 }
             }
