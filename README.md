@@ -29,8 +29,10 @@ EasyGen can be used to extract comments and generate documentation from any code
  ```console
  npm start
  ```
+
  
----
+
+
 
 ## Global Definitions
 
@@ -38,21 +40,30 @@ It's the section where the global variables are defined:
  - list files: it's a list that will contain all the files uploaded by the user;
  - HTMLElement file_sel: points to the file selector on the page;
  - HTMLElement files_done: points to the paragraph that will contain the list of used files;
+ - HTMLElement process_btn: points to the process button that will be used to start the extraction process;
+ - HTMLElement download_div: points to the div where all the download buttons and icons are located;
+ - HTMLElement loading_icon: points to the loading icon that will appear while the extraction is in progress;
+ - bool processed: states whether the uploaded files have been processed or not;
  Also, an event listener is attached to the file selector:
 
 
 ```c
 // the event listener attached to the file selector
-file_sel.addEventListener('change', async (event) => {
-files = event.target.files; // get the files list
-document.getElementById("loading").style.display = "block"; // show the loading animation
-files_done.innerHTML = ''; // reset the files_done paragraph
-await read_files(files); // start reading files
-});
+async function file_handler(event) {
+    files = [...files, ...event.target.files]; // get the files list
+    if (processed) {
+        processed = false;
+        files_done.innerHTML = '';
+    }
+    // list the files that have been selected
+    for (let f of event.target.files) files_done.innerHTML += `⌚ ${f.name}<br>`;
+    download_div.style.display = "none";
+    process_btn.style.display = "block";
+}
 ```
  
 
----
+
 
 ## read_files
 > it reads each file and generates the documentation
@@ -69,7 +80,20 @@ let documentation = generate_docs(await f.text());
 ```
  
 
----
+
+
+## download
+> sets up the download button
+
+assigns to a hidden download link the file to be downloaded and than makes sure that when the download icon is clicked also the link is clicked
+### Inputs
+- string text: complete documentation
+
+### Outputs
+- null.
+ 
+
+
 
 ## generate_docs
 > Generated the documentation extracting the comments data from the file
@@ -84,7 +108,7 @@ it will read the chosen file and will look for the `#@`, which indicates the sta
 - string result: the generated documentation
  
 
----
+
 ---
 # Lexer
 
@@ -95,7 +119,7 @@ this file contains the method used to extract the documentation from the code.
 
  
 
----
+
 
 ## Global Definitions
 > definitions of the global variables
@@ -105,17 +129,17 @@ the only global variable defined is `tokens` containing the tokens used to find 
 
 ```c
 const tokens = {
-open_token: "#@",
-close_token: "@#",
-tag_token: "@",
-description_token: ":",
-cs_token: "#@codestart@#",
-ce_token: "#@codeend@#"
+    open_token: "#@",
+    close_token: "@#",
+    tag_token: "@",
+    description_token: ":",
+    cs_token: "#@codestart@#",
+    ce_token: "#@codeend@#"
 };
 ```
  
 
----
+
 
 ## lexer
 > takes the text as input and finds each section
@@ -127,7 +151,34 @@ ce_token: "#@codeend@#"
 - string tagged: documentation of the file divided by tags.
  
 
----
+
+
+## count_starting_tabs
+> counts the starting tabs and spaces
+
+the method counts the starting tabs and spaces to find the "minimum indentation" of the code snippets.
+ this is useful because it can be used to remove useless indentation in the ode snippets
+### Inputs
+- string string: string from which the tabs and spaces will be counted;
+
+### Outputs
+- [int, int]: count of starting tabs and spaces.
+ 
+
+
+
+## preprocess_tabs
+> removes useless tabs from code snippets
+
+the method uses the `count_starting_tabs` method to remove the **useless** starting tabs and spaces so that the lines of code will not appear as floating lines of text
+### Inputs
+- string string: string to be modified;
+
+### Outputs
+- string: result of the operation.
+ 
+
+
 
 ## extract
 > extracts each section and code snippet from the code
@@ -140,7 +191,7 @@ it looks for the `#@` and `@#` symbols and for the `#@codestart@#` and `#@codeen
 - list data: a list containing each field of the documentation.
  
 
----
+
 
 ## merge
 > merges and sorts the fields of the documentation and the code snippets
@@ -153,7 +204,7 @@ it looks for the `#@` and `@#` symbols and for the `#@codestart@#` and `#@codeen
 - list indexes: sorted list of all the indexes.
  
 
----
+
 
 ## indexize
 > finds the starting and ending indexes based on the delimiters `start` and `end`
@@ -168,7 +219,7 @@ it uses the delimiters as arguments to create a list of javascript objects conta
 - list indexes: list of starting and ending indexes of each field.
  
 
----
+
 
 ## tag
 > takes each field and and divides them in tags and contents
@@ -180,7 +231,7 @@ it uses the delimiters as arguments to create a list of javascript objects conta
 - list tagged: list of javascript objects containing each field (tag=key).
  
 
----
+
 ---
 
 generated with [EasyGen](http://easygen.altervista.org/) - [On Github](https://github.com/dede-amdp/easygen).

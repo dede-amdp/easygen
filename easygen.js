@@ -37,22 +37,48 @@ npm start
 - list files: it's a list that will contain all the files uploaded by the user;
 - HTMLElement file_sel: points to the file selector on the page;
 - HTMLElement files_done: points to the paragraph that will contain the list of used files;
+- HTMLElement process_btn: points to the process button that will be used to start the extraction process;
+- HTMLElement download_div: points to the div where all the download buttons and icons are located;
+- HTMLElement loading_icon: points to the loading icon that will appear while the extraction is in progress;
+- bool processed: states whether the uploaded files have been processed or not;
 Also, an event listener is attached to the file selector:
 @#
 */
 var files = [];
 const file_sel = document.getElementById('file-selector');
 const files_done = document.getElementById('files-done-par');
+const process_btn = document.getElementById('process-button');
+const download_div = document.getElementById('download-div');
+const loading_icon = document.getElementById("loading");
+var processed = false;
+
+
+file_sel.addEventListener('change', file_handler);
+process_btn.addEventListener('click', process_handler);
 
 /* #@codestart@# */
 // the event listener attached to the file selector
-file_sel.addEventListener('change', async (event) => {
-    files = event.target.files; // get the files list
-    document.getElementById("loading").style.display = "block"; // show the loading animation
+async function file_handler(event) {
+    files = [...files, ...event.target.files]; // get the files list
+    if (processed) {
+        processed = false;
+        files_done.innerHTML = '';
+    }
+    // list the files that have been selected
+    for (let f of event.target.files) files_done.innerHTML += `⌚ ${f.name}<br>`;
+    download_div.style.display = "none";
+    process_btn.style.display = "block";
+}
+/* #@codeend@# */
+
+
+async function process_handler(event) {
+    loading_icon.style.display = "block"; // show the loading animation
     files_done.innerHTML = ''; // reset the files_done paragraph
     await read_files(files); // start reading files
-});
-/* #@codeend@# */
+    files = [];
+    processed = true;
+}
 
 /*
 #@
@@ -66,29 +92,49 @@ the function does not return any value but it will run the `download` function.
 @#
 */
 async function read_files(files) {
-    var text = '';
-    for (var f of Object.values(files)) {
-        /* #@codestart@# */
-        let documentation = generate_docs(await f.text());
-        /* #@codeend@# */
-        if (documentation != "") {
-            let title = f.name.split(".")[0];
-            text += `# ${title[0].toUpperCase() + title.slice(1)}\n${documentation}\n---\n`;
-            files_done.innerHTML += `✔️ ${f.name}<br>`;
-        } else {
-            files_done.innerHTML += `❌ ${f.name}<br>`;
+    if (files.length != 0) {
+        var text = '';
+        for (var f of Object.values(files)) {
+            /* #@codestart@# */
+            let documentation = generate_docs(await f.text());
+            /* #@codeend@# */
+            if (documentation != "") {
+                let title = f.name.split(".")[0];
+                text += `# ${title[0].toUpperCase() + title.slice(1)}\n${documentation}\n---\n`;
+                files_done.innerHTML += `✔️ ${f.name}<br>`;
+            } else {
+                files_done.innerHTML += `❌ ${f.name}<br>`;
+            }
         }
+        files_done.innerHTML += `<br><div class="center">✔️ Your Docs are ready!<div><br>`;
+        download(text);
+    } else {
+        files_done.innerHTML += `<br><div class="center">❌ No Files were selected!<div><br>`;
+        loading_icon.style.display = "none";
     }
-    files_done.innerHTML += `<br><div class="center">✔️ Your Docs are ready!<div><br>`;
-    download(text);
 }
 
+/* #@
+@name: download
+@brief: sets up the download button
+@notes: assigns to a hidden download link the file to be downloaded and than makes sure that when the download icon is clicked also the link is clicked
+@inputs: 
+- string text: complete documentation
+@outputs: 
+- null.
+@# */
 function download(text) {
-    document.getElementById("loading").style.display = "none";
+    loading_icon.style.display = "none";
+    process_btn.style.display = "none";
+    download_div.style.display = "block";
     var element = document.getElementById('download-btn');
     var to_download = text + '\ngenerated with [EasyGen](http://easygen.altervista.org/) - [On Github](https://github.com/dede-amdp/easygen).';
     element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(to_download));
     element.setAttribute('download', 'documentation.md');
+    element.onclick = (() => {
+        files = [];
+        files_done.innerHTML = ''; // reset the files_done paragraph
+    });
 }
 
 /*
@@ -126,7 +172,7 @@ function generate_docs(string) {
                 }
             }
         }
-        result += `\n${description} \n${table}\n---`;
+        result += `\n${description} \n${table}\n`;
     }
     return result;
 }

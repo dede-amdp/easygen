@@ -35,9 +35,9 @@ const tokens = {
 */
 function lexer(text) {
     let tokenized = text.replaceAll("\r\n", "\n ").split(" "); // takes away the \r character and divides the string by space
-    for (let i = tokenized.length - 1; i >= 0; i--) {
+    /*for (let i = tokenized.length - 1; i >= 0; i--) {
         if (tokenized[i] == "") tokenized.splice(i, 1); // removes from the array the empty strings
-    }
+    }*/
     let extracted = extract(tokenized); // extract each code section
     let tagged = tag(extracted); // divide by tag
     return tagged;
@@ -85,7 +85,6 @@ function preprocess_tabs(string) {
         if (starting_tabs < min_tabs) min_tabs = starting_tabs;
         if (starting_spaces < min_spaces) min_spaces = starting_spaces;
     }
-
     for (let line of lines_list) {
         let new_line = line;
         for (let i = 0; i < min_tabs; i++) new_line = line.replace("\t", "");

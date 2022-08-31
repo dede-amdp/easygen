@@ -78,6 +78,10 @@ p#files-done-par {
     width: 2.3em;
 }
 
+#process-icon {
+    width: 2.7em;
+}
+
 .footer {
     background-color: #292f36;
     padding: 2em;
