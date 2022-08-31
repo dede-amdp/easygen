@@ -43,6 +43,58 @@ function lexer(text) {
     return tagged;
 }
 
+/* #@
+@name: count_starting_tabs
+@brief: counts the starting tabs and spaces
+@notes: the method counts the starting tabs and spaces to find the "minimum indentation" of the code snippets.
+this is useful because it can be used to remove useless indentation in the ode snippets
+@inputs: 
+- string string: string from which the tabs and spaces will be counted;
+@outputs: 
+- [int, int]: count of starting tabs and spaces.
+@# */
+function count_starting_tabs(string) {
+    let count_tabs = 0;
+    let count_spaces = 0;
+    for (let c of string) {
+        if (c != "\t" && c != " ") break;
+        else if (c == "\t") count_tabs++;
+        else if (c == " ") count_spaces++;
+    }
+    return [count_tabs, count_spaces];
+}
+
+
+/* #@
+@name: preprocess_tabs
+@brief: removes useless tabs from code snippets
+@notes: the method uses the `count_starting_tabs` method to remove the **useless** starting tabs and spaces so that the lines of code will not appear as floating lines of text
+@inputs: 
+- string string: string to be modified;
+@outputs: 
+- string: result of the operation.
+@# */
+function preprocess_tabs(string) {
+    let result = ""
+    let lines_list = string.split("\n");
+    let min_tabs = 1000000;
+    let min_spaces = 1000000;
+    for (let i = 1; i < lines_list.length - 1; i++) {
+        let line = lines_list[i]
+        let [starting_tabs, starting_spaces] = count_starting_tabs(line);
+        if (starting_tabs < min_tabs) min_tabs = starting_tabs;
+        if (starting_spaces < min_spaces) min_spaces = starting_spaces;
+    }
+
+    for (let line of lines_list) {
+        let new_line = line;
+        for (let i = 0; i < min_tabs; i++) new_line = line.replace("\t", "");
+        for (let i = 0; i < min_spaces; i++) new_line = new_line.replace(" ", "");
+        result += new_line + "\n";
+    }
+    return result;
+}
+
 /*
 #@
 @name: extract
@@ -64,10 +116,10 @@ function extract(tokenized) {
     for (let i of indexes) {
         let string = tokenized.slice(i.start + 1, i.close).join(" ");
         if (string[0] != "@") {
-            let retokenized = string.trim().split("\n");
+            untabbed_string = preprocess_tabs(string);
+            let retokenized = untabbed_string.trim().split("\n");
             for (let k = retokenized.length - 1; k >= 0; k--) {
                 if (retokenized[k] == "") retokenized.splice(k, 1);
-                else retokenized[k] = retokenized[k].trim();
             }
             retokenized.splice(0, 1);
             retokenized.splice(retokenized.length - 1, 1);
