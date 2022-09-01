@@ -114,7 +114,7 @@ function extract(tokenized) {
     let unique_id = 0;
     for (let i of indexes) {
         let string = tokenized.slice(i.start + 1, i.close).join(" ");
-        if (string[0] != "@") {
+        if (string.trim()[0] != "@") {
             untabbed_string = preprocess_tabs(string);
             let retokenized = untabbed_string.trim().split("\n");
             for (let k = retokenized.length - 1; k >= 0; k--) {
@@ -204,13 +204,14 @@ function indexize(tokenized, start, end) {
 function tag(extracted) {
     let tagged = []
     for (let data of extracted) {
-        let tokenized = data.split(/:|\s/);
+        data = data.trim();
+        let tokenized = data.trim().split(/:|\s/);
         let tags = tokenized.filter((value) => value[0] == "@");
         let regex = new RegExp(`(${tags.join(":|")}:)`);
         let contents = data.split(regex);
         contents = contents.filter((value) => !tags.includes(value.substring(0, value.length - 1)) && value != "");
         if (tags.length != contents.length) {
-            tags_string = tags.join("\n") + "\n" + contents.join("\n\n");
+            tags_string = "Tags:\n" + tags.join("\n---\n") + "\nContents:\n" + contents.join("\n---\n");
             throw Error(`The number of tags is not the same as the number of contents: maybe a tag without contents was added ?\nTags found ${tags.length}, Contents found: ${contents.length}.\n${tags_string}\n`);
             return null;
         }
